@@ -60,11 +60,11 @@ const (
 type Option func(*stack.Stack) error
 
 // WithDefault sets all default values for stack.
-func WithDefault() Option {
+func WithDefault(enableIPv6 bool) Option {
 	return func(s *stack.Stack) error {
 		opts := []Option{
-			WithDefaultTTL(defaultTimeToLive),
-			WithForwarding(ipForwardingEnabled),
+			WithDefaultTTL(enableIPv6, defaultTimeToLive),
+			WithForwarding(enableIPv6, ipForwardingEnabled),
 
 			// Config default stack ICMP settings.
 			WithICMPBurst(icmpBurst), WithICMPLimit(icmpLimit),
@@ -110,27 +110,31 @@ func WithDefault() Option {
 }
 
 // WithDefaultTTL sets the default TTL used by stack.
-func WithDefaultTTL(ttl uint8) Option {
+func WithDefaultTTL(enableIPv6 bool, ttl uint8) Option {
 	return func(s *stack.Stack) error {
 		opt := tcpip.DefaultTTLOption(ttl)
 		if err := s.SetNetworkProtocolOption(ipv4.ProtocolNumber, &opt); err != nil {
 			return fmt.Errorf("set ipv4 default TTL: %s", err)
 		}
-		if err := s.SetNetworkProtocolOption(ipv6.ProtocolNumber, &opt); err != nil {
-			return fmt.Errorf("set ipv6 default TTL: %s", err)
+		if enableIPv6 {
+			if err := s.SetNetworkProtocolOption(ipv6.ProtocolNumber, &opt); err != nil {
+				return fmt.Errorf("set ipv6 default TTL: %s", err)
+			}
 		}
 		return nil
 	}
 }
 
 // WithForwarding sets packet forwarding between NICs for IPv4 & IPv6.
-func WithForwarding(v bool) Option {
+func WithForwarding(enableIPv6 bool, v bool) Option {
 	return func(s *stack.Stack) error {
 		if err := s.SetForwardingDefaultAndAllNICs(ipv4.ProtocolNumber, v); err != nil {
 			return fmt.Errorf("set ipv4 forwarding: %s", err)
 		}
-		if err := s.SetForwardingDefaultAndAllNICs(ipv6.ProtocolNumber, v); err != nil {
-			return fmt.Errorf("set ipv6 forwarding: %s", err)
+		if enableIPv6 {
+			if err := s.SetForwardingDefaultAndAllNICs(ipv6.ProtocolNumber, v); err != nil {
+				return fmt.Errorf("set ipv6 forwarding: %s", err)
+			}
 		}
 		return nil
 	}

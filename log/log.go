@@ -36,7 +36,7 @@ func Errorf(format string, args ...any) {
 }
 
 func Fatalf(format string, args ...any) {
-	logrus.Fatalf(format, args...)
+	logf(FatalLevel, format, args...)
 }
 
 func logf(level Level, format string, args ...any) {
@@ -47,12 +47,14 @@ func logf(level Level, format string, args ...any) {
 
 	switch level {
 	case DebugLevel:
-		logrus.WithTime(event.Time).Debugln(event.Message)
+		logrus.WithTime(event.Time).WithField("fromapp", "igniter-golib-log-tun2socks").Debugln(event.Message)
 	case InfoLevel:
-		logrus.WithTime(event.Time).Infoln(event.Message)
+		logrus.WithTime(event.Time).WithField("fromapp", "igniter-golib-log-tun2socks").Infoln(event.Message)
 	case WarnLevel:
-		logrus.WithTime(event.Time).Warnln(event.Message)
+		logrus.WithTime(event.Time).WithField("fromapp", "igniter-golib-log-tun2socks").Warnln(event.Message)
 	case ErrorLevel:
-		logrus.WithTime(event.Time).Errorln(event.Message)
+		logrus.WithTime(event.Time).WithField("fromapp", "igniter-golib-log-tun2socks").Errorln(event.Message)
+	case FatalLevel:
+		logrus.WithTime(event.Time).WithField("fromapp", "igniter-golib-log-tun2socks").Fatalln(event.Message)
 	}
 }

@@ -19,7 +19,7 @@ func init() {
 		downloadTotal: atomic.NewInt64(0),
 	}
 
-	go DefaultManager.handle()
+	//go DefaultManager.handle()
 }
 
 type Manager struct {

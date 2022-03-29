@@ -8,18 +8,31 @@ import (
 	"gvisor.dev/gvisor/pkg/tcpip/stack"
 )
 
-func withRouteTable(nicID tcpip.NICID) option.Option {
-	return func(s *stack.Stack) error {
-		s.SetRouteTable([]tcpip.Route{
-			{
-				Destination: header.IPv4EmptySubnet,
-				NIC:         nicID,
-			},
-			{
-				Destination: header.IPv6EmptySubnet,
-				NIC:         nicID,
-			},
-		})
-		return nil
+func withRouteTable(enableIPv6 bool, nicID tcpip.NICID) option.Option {
+	if enableIPv6 {
+		return func(s *stack.Stack) error {
+			s.SetRouteTable([]tcpip.Route{
+				{
+					Destination: header.IPv4EmptySubnet,
+					NIC:         nicID,
+				},
+				{
+					Destination: header.IPv6EmptySubnet,
+					NIC:         nicID,
+				},
+			})
+			return nil
+		}
+	} else {
+		return func(s *stack.Stack) error {
+			s.SetRouteTable([]tcpip.Route{
+				{
+					Destination: header.IPv4EmptySubnet,
+					NIC:         nicID,
+				},
+			})
+			return nil
+		}
 	}
+
 }

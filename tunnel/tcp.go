@@ -26,6 +26,7 @@ func handleTCPConn(localConn adapter.TCPConn) {
 	defer localConn.Close()
 
 	id := localConn.ID()
+	log.Debugf("[TCP] handleTCPConn id %v", id)
 	metadata := &M.Metadata{
 		Network: M.TCP,
 		SrcIP:   net.IP(id.RemoteAddress),
@@ -41,7 +42,8 @@ func handleTCPConn(localConn adapter.TCPConn) {
 	}
 	metadata.MidIP, metadata.MidPort = parseAddr(targetConn.LocalAddr())
 
-	targetConn = newTCPTracker(targetConn, metadata)
+	// igniter: no statistic
+	//targetConn = newTCPTracker(targetConn, metadata)
 	defer targetConn.Close()
 
 	log.Infof("[TCP] %s <-> %s", metadata.SourceAddress(), metadata.DestinationAddress())

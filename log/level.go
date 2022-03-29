@@ -14,6 +14,7 @@ const (
 	WarnLevel
 	InfoLevel
 	DebugLevel
+	FatalLevel
 )
 
 // UnmarshalJSON deserialize Level with json
@@ -49,6 +50,8 @@ func (level Level) String() string {
 		return "error"
 	case SilentLevel:
 		return "silent"
+	case FatalLevel:
+		return "fatal"
 	default:
 		return fmt.Sprintf("not a valid level %d", level)
 	}
@@ -66,6 +69,8 @@ func ParseLevel(lvl string) (Level, error) {
 		return InfoLevel, nil
 	case "debug":
 		return DebugLevel, nil
+	case "fatal":
+		return FatalLevel, nil
 	default:
 		return Level(0), fmt.Errorf("not a valid logrus Level: %q", lvl)
 	}

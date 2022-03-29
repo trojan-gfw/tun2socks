@@ -45,7 +45,8 @@ func handleUDPConn(uc adapter.UDPConn) {
 	}
 	metadata.MidIP, metadata.MidPort = parseAddr(pc.LocalAddr())
 
-	pc = newUDPTracker(pc, metadata)
+	// igniter: no statistic
+	//pc = newUDPTracker(pc, metadata)
 	defer pc.Close()
 
 	remote := metadata.Addr()

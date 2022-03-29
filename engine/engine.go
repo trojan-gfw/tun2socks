@@ -48,6 +48,7 @@ type Key struct {
 	Device     string `yaml:"device"`
 	LogLevel   string `yaml:"loglevel"`
 	Interface  string `yaml:"interface"`
+	EnableIPv6 bool   `yaml:"-"`
 }
 
 type engine struct {
@@ -65,8 +66,8 @@ func (e *engine) start() error {
 
 	for _, f := range []func() error{
 		e.applyLogLevel,
-		e.applyDialer,
-		e.applyStats,
+		//e.applyDialer,
+		//e.applyStats,
 		e.applyUDPTimeout,
 		e.applyProxy,
 		e.applyDevice,
@@ -169,6 +170,6 @@ func (e *engine) applyStack() (err error) {
 		}
 	}()
 
-	e.stack, err = core.CreateStackWithOptions(e.device, &fakeTunnel{}, option.WithDefault())
+	e.stack, err = core.CreateStackWithOptions(e.EnableIPv6, e.device, &fakeTunnel{}, option.WithDefault(e.EnableIPv6))
 	return
 }

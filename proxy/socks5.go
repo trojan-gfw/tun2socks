@@ -58,6 +58,7 @@ func (ss *Socks5) DialContext(ctx context.Context, metadata *M.Metadata) (c net.
 			Password: ss.pass,
 		}
 	}
+	fmt.Printf("socks5 DialContext metadata %v\n", metadata)
 
 	_, err = socks5.ClientHandshake(c, serializeSocksAddr(metadata), socks5.CmdConnect, user)
 	return
@@ -163,6 +164,7 @@ func (pc *socksPacketConn) ReadFrom(b []byte) (int, net.Addr, error) {
 	if err != nil {
 		return 0, nil, err
 	}
+	fmt.Printf("socks5 ReadFrom after DecodeUDPPacket addr %v payload %v\n", addr, payload[:n - len(addr) - 3])
 
 	udpAddr := addr.UDPAddr()
 	if udpAddr == nil {
@@ -180,5 +182,7 @@ func (pc *socksPacketConn) Close() error {
 }
 
 func serializeSocksAddr(m *M.Metadata) socks5.Addr {
-	return socks5.SerializeAddr("", m.DstIP, m.DstPort)
+	a := socks5.SerializeAddr("", m.DstIP, m.DstPort)
+	fmt.Printf("socks5 serializeSocksAddr metadata %v return %v\n", m, a)
+	return a
 }

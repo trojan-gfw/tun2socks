@@ -14,19 +14,33 @@ import (
 )
 
 // CreateStackWithOptions creates *stack.Stack with given options.
-func CreateStackWithOptions(linkEP stack.LinkEndpoint, handler adapter.Handler, opts ...option.Option) (*stack.Stack, error) {
-	s := stack.New(stack.Options{
-		NetworkProtocols: []stack.NetworkProtocolFactory{
-			ipv4.NewProtocol,
-			ipv6.NewProtocol,
-		},
-		TransportProtocols: []stack.TransportProtocolFactory{
-			tcp.NewProtocol,
-			udp.NewProtocol,
-			icmp.NewProtocol4,
-			icmp.NewProtocol6,
-		},
-	})
+func CreateStackWithOptions(enableIPv6 bool, linkEP stack.LinkEndpoint, handler adapter.Handler, opts ...option.Option) (*stack.Stack, error) {
+	var s *stack.Stack
+	if enableIPv6 {
+		s = stack.New(stack.Options{
+			NetworkProtocols: []stack.NetworkProtocolFactory{
+				ipv4.NewProtocol,
+				ipv6.NewProtocol,
+			},
+			TransportProtocols: []stack.TransportProtocolFactory{
+				tcp.NewProtocol,
+				udp.NewProtocol,
+				icmp.NewProtocol4,
+				icmp.NewProtocol6,
+			},
+		})
+	} else {
+		s = stack.New(stack.Options{
+			NetworkProtocols: []stack.NetworkProtocolFactory{
+				ipv4.NewProtocol,
+			},
+			TransportProtocols: []stack.TransportProtocolFactory{
+				tcp.NewProtocol,
+				udp.NewProtocol,
+				icmp.NewProtocol4,
+			},
+		})
+	}
 
 	// Generate unique NIC id.
 	nicID := tcpip.NICID(s.UniqueID())
@@ -60,7 +74,7 @@ func CreateStackWithOptions(linkEP stack.LinkEndpoint, handler adapter.Handler, 
 
 		// Add default route table for IPv4 and IPv6. This will handle
 		// all incoming ICMP packets.
-		withRouteTable(nicID),
+		withRouteTable(enableIPv6, nicID),
 
 		// Initiate transport protocol (TCP/UDP) with given handler.
 		withTCPHandler(handler.HandleTCP), withUDPHandler(handler.HandleUDP),
